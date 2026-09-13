@@ -14,7 +14,10 @@ import (
 	"strings"
 )
 
-var idPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9._-]*$`)
+var (
+	idPattern             = regexp.MustCompile(`^[a-z0-9][a-z0-9._-]*$`)
+	msiProductCodePattern = regexp.MustCompile(`^\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\}$`)
+)
 
 type Catalog struct {
 	SchemaVersion int       `json:"schemaVersion"`
@@ -36,10 +39,11 @@ type Package struct {
 }
 
 type Install struct {
-	Args        []string        `json:"args,omitempty"`
-	Destination string          `json:"destination,omitempty"`
-	AddToPath   []string        `json:"addToPath,omitempty"`
-	StartMenu   *StartMenuEntry `json:"startMenu,omitempty"`
+	Args                   []string        `json:"args,omitempty"`
+	Destination            string          `json:"destination,omitempty"`
+	AddToPath              []string        `json:"addToPath,omitempty"`
+	StartMenu              *StartMenuEntry `json:"startMenu,omitempty"`
+	UninstallBeforeInstall string          `json:"uninstallBeforeInstall,omitempty"`
 }
 
 type StartMenuEntry struct {
@@ -215,6 +219,14 @@ func validatePackage(pkg Package) error {
 		}
 		if !strings.HasSuffix(strings.ToLower(pkg.Install.StartMenu.Name), ".lnk") {
 			return fmt.Errorf("install.startMenu.name must end in .lnk")
+		}
+	}
+	if pkg.Install.UninstallBeforeInstall != "" {
+		if pkg.Type != "msi" {
+			return fmt.Errorf("install.uninstallBeforeInstall is supported only for msi packages")
+		}
+		if !msiProductCodePattern.MatchString(pkg.Install.UninstallBeforeInstall) {
+			return fmt.Errorf("install.uninstallBeforeInstall must be an MSI product-code GUID in braces")
 		}
 	}
 	return nil

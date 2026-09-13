@@ -412,11 +412,11 @@ present; a leftover launcher file by itself is not accepted as a working install
 
 Arduino IDE, RAPTOR, and Dev-C++ are given all-users Start-menu shortcuts by the
 client. Arduino IDE and RAPTOR are also installed in machine-wide MSI mode. For
-an older RAPTOR copy that was created per-user, run once with `-Force`. Windows
-Installer cannot change an existing Arduino installation from per-user to
-machine-wide: remove that old copy from **Installed apps** while signed in as the
-account that installed it, then run SETUP again. Use the same remove-and-rerun
-procedure if Windows Installer reports error 1638 for RAPTOR.
+an older copy of Arduino IDE, SETUP removes the existing MSI registration before
+installing it machine-wide because Windows Installer cannot change that context
+in place. For an older RAPTOR copy that was created per-user, run once with
+`-Force`. If Windows Installer reports error 1638 for RAPTOR, remove that old
+copy from **Installed apps** and run SETUP again.
 
 ## Package types
 

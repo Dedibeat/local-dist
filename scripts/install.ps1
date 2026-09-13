@@ -169,6 +169,19 @@ function Get-PackageFile {
 function Install-Package {
     param([object]$Package, [string]$Installer)
 
+    if (-not [string]::IsNullOrWhiteSpace($Package.install.uninstallBeforeInstall)) {
+        $productCode = $Package.install.uninstallBeforeInstall
+        Write-Host "Removing the existing $($Package.name) installation before migration..."
+        $removeProcess = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/x', $productCode, '/qn', '/norestart') -Wait -PassThru
+        Write-Host "Uninstaller exit code for $($Package.id): $($removeProcess.ExitCode)"
+        if ($removeProcess.ExitCode -notin @(0, 1605, 1614, 1641, 3010)) {
+            throw "Uninstaller for '$($Package.id)' exited with code $($removeProcess.ExitCode)."
+        }
+        if ($removeProcess.ExitCode -in @(1641, 3010)) {
+            $script:RebootRequired = $true
+        }
+    }
+
     Write-Host "Installing $($Package.name) $($Package.version)..."
     $process = $null
     switch ($Package.type) {

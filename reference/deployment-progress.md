@@ -224,7 +224,9 @@ MSI Directory table defines its machine target as
 `ALLUSERS=1 MSIINSTALLPERUSER=`, checks the machine target, and repairs an
 all-users shortcut. Windows Installer returned success without changing the
 context of an already-installed per-user copy, so that old copy must be removed
-once before rerunning SETUP.
+before reinstalling. The Arduino catalog entry now supplies its MSI product code,
+and SETUP performs that remove-and-reinstall migration automatically whenever
+the machine-wide executable is missing.
 
 ### 4. Remaining `detect` paths need wider Windows coverage
 

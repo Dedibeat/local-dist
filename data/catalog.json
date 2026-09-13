@@ -138,6 +138,7 @@
       "sha256": "aebbd1efeac5cfb02a6cad0d93af8221054fc983a5b3c5ce6da8a6bfb9425165",
       "install": {
         "args": ["ALLUSERS=1", "MSIINSTALLPERUSER="],
+        "uninstallBeforeInstall": "{2512FA64-8592-4C98-8430-9262623F95F0}",
         "startMenu": {
           "folder": "Arduino IDE",
           "name": "Arduino IDE.lnk"

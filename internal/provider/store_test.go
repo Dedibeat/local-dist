@@ -113,6 +113,33 @@ func TestValidatePackageStartMenu(t *testing.T) {
 	}
 }
 
+func TestValidatePackageUninstallBeforeInstall(t *testing.T) {
+	base := Package{
+		ID: "demo", Name: "Demo", Version: "1.0", Type: "msi",
+		Source: "packages/demo/setup.msi", SHA256: strings.Repeat("0", 64),
+	}
+	base.Install.UninstallBeforeInstall = "{2512FA64-8592-4C98-8430-9262623F95F0}"
+	if err := validatePackage(base); err != nil {
+		t.Fatalf("validate MSI replacement: %v", err)
+	}
+
+	for _, test := range []struct {
+		packageType string
+		productCode string
+	}{
+		{"exe", "{2512FA64-8592-4C98-8430-9262623F95F0}"},
+		{"msi", "2512FA64-8592-4C98-8430-9262623F95F0"},
+		{"msi", "{not-a-product-code}"},
+	} {
+		pkg := base
+		pkg.Type = test.packageType
+		pkg.Install.UninstallBeforeInstall = test.productCode
+		if err := validatePackage(pkg); err == nil {
+			t.Fatalf("accepted %s replacement product code %q", test.packageType, test.productCode)
+		}
+	}
+}
+
 func TestReadJSONRejectsTrailingContent(t *testing.T) {
 	for _, suffix := range []string{` {"schemaVersion":2}`, " garbage"} {
 		filename := filepath.Join(t.TempDir(), "catalog.json")
