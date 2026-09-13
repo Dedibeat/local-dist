@@ -1,51 +1,46 @@
-Paste into an elevated Command Prompt on the new PC:                                                                                      
-                                                                                                                                           
- ```cmd                                                                                                                                    
-    net use Z: /delete /y >nul 2>&1 & net use Z: \\10.3.122.102\software-scripts /user:dedibeat <share-password> 
-    Z:\setup.cmd room-302 -ServerUrl http://10.3.122.102:8080                                             
- ```                                                                                                                                       
-                                                                                                                                           
- It prompts Type the password for \\10.3.122.102\software-scripts: — type <share-password>.                                                 
-                                                                                                                                           
- Why the *: it makes net use prompt for the password instead of embedding it in the command line, so the password doesn't land in the      
- session history. If you'd rather skip the prompt:                                                                                         
-                                                                                                                                           
- ```cmd                                                                                                                                    
-   net use \\10.3.122.102\software-scripts /user:dedibeat <share-password> && powershell -NoProfile -ExecutionPolicy Bypass -File           
- \\10.3.122.102\software-scripts\install.ps1 room-302 -ServerUrl http://10.3.122.102:8080                                                  
- ```                                                                                                                                       
-                                                                                                                                           
- Change room-302 for a different room. Everything else stays fixed.                                                                        
-                                                                                                                                           
- Parts: net use … && authenticates (the && stops everything if the password is wrong) → -ExecutionPolicy Bypass is required because the    
- script lives on a UNC path → install.ps1 runs elevated because the prompt already is.                                                     
-                                                                                                                                           
- ────────────────────────────────────────────────────────────────────────────────                                                          
-                                                                                                                                           
- Two variants you may want                                                                                                                 
-                                                                                                                                           
- On a re-imaged PC that might hold a stale credential — clears it first, ignores failure:                                                  
-                                                                                                                                           
- ```cmd                                                                                                                                    
-   cmdkey /delete:10.3.122.102 >nul 2>&1 & net use \\10.3.122.102\software-scripts /delete /y >nul 2>&1 & net use                          
- \\10.3.122.102\software-scripts /user:dedibeat * && powershell -NoProfile -ExecutionPolicy Bypass -File                                   
- \\10.3.122.102\software-scripts\install.ps1 room-302 -ServerUrl http://10.3.122.102:8080                                                  
- ```                                                                                                                                       
-                                                                                                                                           
- Self-elevating, so you can run it from a normal prompt (raises the UAC box itself). I have not tested this on Windows — quoting through   
- Start-Process is the fragile part, so treat it as a convenience, not the reliable path:                                                   
-                                                                                                                                           
- ```cmd                                                                                                                                    
-   powershell -NoProfile -Command "Start-Process cmd -Verb RunAs -ArgumentList '/c net use \\10.3.122.102\software-scripts /user:dedibeat  
- * && powershell -NoProfile -ExecutionPolicy Bypass -File \\10.3.122.102\software-scripts\install.ps1 room-302 -ServerUrl                  
- http://10.3.122.102:8080 & pause'"                                                                                                        
- ```                                                                                                                                       
-                                                                                                                                           
- ────────────────────────────────────────────────────────────────────────────────                                                          
-                                                                                                                                           
- Honest status                                                                                                                             
-                                                                                                                                           
- The SMB auth path and the HTTP download path are both verified from Linux. The net use + -File invocation itself I cannot test — no       
- Windows machine here. Try it on one PC before trusting it across rooms.                                                                   
-                                                                                                                                           
- Also still true: Room 302 is complete: false with 4 pending requirement groups, so this installs 8 packages, not a finished room.
+# Windows room setup
+
+Run the following in an **elevated Command Prompt** on the new Windows PC.
+The `*` makes Windows prompt for the Samba password without putting it on the
+command line.
+
+## Recommended: map the script share
+
+```cmd
+net use Z: /delete /y >nul 2>&1 & net use Z: \\10.3.122.102\software-scripts /user:dedibeat * && Z:\setup.cmd room-302 -ServerUrl http://10.3.122.102:8080
+```
+
+Change `room-302` for a different room. Change `10.3.122.102` if the server's
+address changes. The first `net use` only removes an old mapping; its failure
+is intentionally ignored. The `&&` prevents setup from running when share
+authentication fails.
+
+## Direct UNC invocation
+
+This avoids assigning a drive letter:
+
+```cmd
+net use \\10.3.122.102\software-scripts /user:dedibeat * && powershell -NoProfile -ExecutionPolicy Bypass -File \\10.3.122.102\software-scripts\install.ps1 room-302 -ServerUrl http://10.3.122.102:8080
+```
+
+Setup writes a transcript to
+`C:\ProgramData\MTES\LocalDist\logs`. To choose a specific log file, append:
+
+```cmd
+-LogPath C:\Temp\room-302-setup.log
+```
+
+## Stale credentials
+
+On a re-imaged PC, clear the old credential and connection first:
+
+```cmd
+cmdkey /delete:10.3.122.102 >nul 2>&1 & net use \\10.3.122.102\software-scripts /delete /y >nul 2>&1 & net use \\10.3.122.102\software-scripts /user:dedibeat * && powershell -NoProfile -ExecutionPolicy Bypass -File \\10.3.122.102\software-scripts\install.ps1 room-302 -ServerUrl http://10.3.122.102:8080
+```
+
+If the Command Prompt is not elevated, close it and choose **Run as
+administrator**. The Windows client requires elevation.
+
+Room 302 is still incomplete: it has four pending requirement groups. This
+command installs its eight approved packages; it does not finish the room's
+remaining requirements.

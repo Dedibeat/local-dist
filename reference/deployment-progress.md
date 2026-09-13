@@ -236,12 +236,13 @@ need confirmation during the first room deployment.
 
 ### 5. "Completed successfully" did not mean the software was usable — fixed
 
-The client now retries verification briefly, then fails the deployment when
-post-install detection still fails. Command detection also checks an
-executable's exit code. This caught TypeScript 7's broken launcher: the main npm
-tarball requires a separate Windows x64 compiler package that the old offline
-install did not provide. That platform package is now part of every TypeScript
-room plan, and `tsc.cmd --version` verifies it.
+The client now retries verification briefly, records a package failure, and
+continues with the remaining packages when post-install detection still fails.
+The overall run returns exit code `1` if any package failed. Command detection
+also checks an executable's exit code. This caught TypeScript 7's broken
+launcher: the main npm tarball requires a separate Windows x64 compiler package
+that the old offline install did not provide. That platform package is now part
+of every TypeScript room plan, and `tsc.cmd --version` verifies it.
 
 ### 6. Rooms are incomplete
 

@@ -396,7 +396,9 @@ file to the operator when a Windows installation needs investigation.
 
 Detection checks whether a file exists; it does not compare installed versions.
 After an installer exits successfully, SETUP retries its verification briefly
-and fails if the expected file or command is still unavailable. To update or
+and records a failure if the expected file or command is still unavailable.
+Package failures are logged and skipped so the remaining room packages can
+continue. SETUP returns exit code `1` when any package fails. To update or
 reinstall software that is already detected, add `-Force`:
 
 ```cmd

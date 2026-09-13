@@ -18,6 +18,7 @@ $CacheRoot = Join-Path $env:ProgramData 'MTES\LocalDist\cache'
 $script:RebootRequired = $false
 $script:TranscriptStarted = $false
 $script:LogAvailable = $false
+$script:FailedPackages = @()
 $exitCode = 1
 
 if ([string]::IsNullOrWhiteSpace($LogPath)) {
@@ -310,24 +311,35 @@ try {
     }
 
     foreach ($package in $plan.packages) {
-        if (-not $Force -and (Test-PackageInstalled -Package $package)) {
-            Write-Host "Already installed: $($package.name)"
+        try {
+            if (-not $Force -and (Test-PackageInstalled -Package $package)) {
+                Write-Host "Already installed: $($package.name)"
+            }
+            else {
+                $installer = Get-PackageFile -Package $package
+                Install-Package -Package $package -Installer $installer
+                Assert-PackageInstalled -Package $package
+            }
+            Update-PackagePath -Package $package
+            Ensure-StartMenuShortcut -Package $package
         }
-        else {
-            $installer = Get-PackageFile -Package $package
-            Install-Package -Package $package -Installer $installer
-            Assert-PackageInstalled -Package $package
+        catch {
+            $script:FailedPackages += $package.id
+            Write-Warning "Skipping package '$($package.id)': $($_.Exception.Message)"
         }
-        Update-PackagePath -Package $package
-        Ensure-StartMenuShortcut -Package $package
     }
 
-    Write-Host 'Available deployment batch completed successfully.'
-    if ($script:RebootRequired) {
+    if ($script:FailedPackages.Count -gt 0) {
+        Write-Warning "Deployment completed with $($script:FailedPackages.Count) failed package(s): $($script:FailedPackages -join ', ')"
+        $exitCode = 1
+    }
+    elseif ($script:RebootRequired) {
+        Write-Host 'Available deployment batch completed successfully.'
         Write-Warning 'Restart Windows to finish installation.'
         $exitCode = 3010
     }
     else {
+        Write-Host 'Available deployment batch completed successfully.'
         $exitCode = 0
     }
 }
