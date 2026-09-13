@@ -16,6 +16,7 @@ read-only, and keep Windows scripts compatible with built-in Windows PowerShell
 - `data/packages/`: local installer payloads, ignored by Git except `.gitkeep`.
 - `scripts/`: Windows installation client and Linux package-copy helper.
 - `deployments/`, `Dockerfile`, and `compose.yaml`: Linux and Windows deployment examples.
+- `server.cmd`: one-command Windows provider bootstrap.
 - `reference/`: original room requirements and planning notes.
 - `README.md`: operator instructions; update it when behavior or commands change.
 

@@ -180,22 +180,35 @@ runs the Go provider as `SYSTEM` at startup and exposes a read-only authenticate
 SMB share. Use a PC that remains powered on and has a stable IP address or DNS
 name. The installer opens ports 8080 and 445 only to the local subnet.
 
-First restore the approved package files under `data\packages`. If this checkout
-does not contain them, download and verify them before continuing:
+Open **Command Prompt as Administrator** in the project directory and run:
 
-```powershell
-go run ./cmd/fetch-packages -data ./data
+```cmd
+server.cmd
 ```
 
-Open **Windows PowerShell as Administrator** in the project directory and run:
+This one command finds Go 1.23 or newer or installs a private Go toolchain from
+the official Go download service. It verifies the published toolchain checksum,
+downloads and verifies every catalog package, builds the provider, configures
+the share and firewall, starts the provider, and checks its health. It asks for
+a password when it creates the local `localdist-deploy` SMB account.
+
+If all approved payloads have already been copied into `data\packages` and this
+server must not download them again, run:
+
+```cmd
+server.cmd -SkipPackageDownload
+```
+
+The lower-level PowerShell installer can configure the host without downloading
+packages or provisioning a build toolchain:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\deployments\install-windows-server.ps1
 ```
 
-The script builds `local-dist.exe`, copies the provider data to
+The installation copies the provider data to
 `C:\ProgramData\MTES\LocalDistServer`, and asks for a password when it creates
-the local `localdist-deploy` account. It then creates:
+the local account. It then creates:
 
 - the `\\SERVER-PC\software` read-only share;
 - the `MTES LocalDist Provider` scheduled task;
