@@ -88,22 +88,20 @@ function Test-PackageInstalled {
             return $false
         }
 
-        $startOptions = @{
-            FilePath = $path
-            Wait = $true
-            PassThru = $true
-        }
+        $commandArguments = @()
         if ($null -ne $Package.detect.args -and @($Package.detect.args).Count -gt 0) {
-            $startOptions.ArgumentList = @($Package.detect.args)
+            $commandArguments = @($Package.detect.args)
         }
         try {
-            $process = Start-Process @startOptions
-            $installed = $process.ExitCode -eq 0
-            Write-Host "Detection for $($Package.id): $installed (command exit code $($process.ExitCode): $path)"
+            # Invoke script launchers synchronously so detection observes their final exit code.
+            & $path @commandArguments *> $null
+            $exitCode = $LASTEXITCODE
+            $installed = $exitCode -eq 0
+            Write-Host "Detection for $($Package.id): $installed (command exit code ${exitCode}: $path)"
             return $installed
         }
         catch {
-            Write-Host "Detection for $($Package.id): False (command failed: $path)"
+            Write-Host "Detection for $($Package.id): False (command failed: $path; $($_.Exception.Message))"
             return $false
         }
     }
