@@ -1,17 +1,17 @@
 Paste into an elevated Command Prompt on the new PC:                                                                                      
                                                                                                                                            
  ```cmd                                                                                                                                    
-    net use Z: /delete /y >nul 2>&1 & net use Z: \\10.3.122.102\software-scripts /user:dedibeat RoomDeploy-2026 
+    net use Z: /delete /y >nul 2>&1 & net use Z: \\10.3.122.102\software-scripts /user:dedibeat <share-password> 
     Z:\setup.cmd room-302 -ServerUrl http://10.3.122.102:8080                                             
  ```                                                                                                                                       
                                                                                                                                            
- It prompts Type the password for \\10.3.122.102\software-scripts: — type RoomDeploy-2026.                                                 
+ It prompts Type the password for \\10.3.122.102\software-scripts: — type <share-password>.                                                 
                                                                                                                                            
  Why the *: it makes net use prompt for the password instead of embedding it in the command line, so the password doesn't land in the      
  session history. If you'd rather skip the prompt:                                                                                         
                                                                                                                                            
  ```cmd                                                                                                                                    
-   net use \\10.3.122.102\software-scripts /user:dedibeat RoomDeploy-2026 && powershell -NoProfile -ExecutionPolicy Bypass -File           
+   net use \\10.3.122.102\software-scripts /user:dedibeat <share-password> && powershell -NoProfile -ExecutionPolicy Bypass -File           
  \\10.3.122.102\software-scripts\install.ps1 room-302 -ServerUrl http://10.3.122.102:8080                                                  
  ```                                                                                                                                       
                                                                                                                                            

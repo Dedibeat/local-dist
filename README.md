@@ -212,6 +212,20 @@ Go to the bottom and add:
     valid users = deploy
 ```
 
+The share on its own is not enough. Samba's default `map to guest = bad user`
+turns the technician's Windows user name — which does not exist on Linux — into a
+guest session, and Windows then refuses it with "your organization's security
+policies block unauthenticated guest access". Add these two lines to the
+`[global]` section near the top of the same file:
+
+```ini
+   map to guest = never
+   restrict anonymous = 2
+```
+
+`map to guest = never` makes Samba reject an unknown user name outright, so
+Windows asks for the share password instead of trying guest access.
+
 Save with `Ctrl+O`, press `Enter`, and close Nano with `Ctrl+X`.
 
 Check the configuration and start Samba:
@@ -479,6 +493,38 @@ sudo systemctl status smbd
 ```
 
 Also confirm that Windows and Linux are connected to the same network.
+
+### Windows says guest access is blocked
+
+The message "your organization's security policies block unauthenticated guest
+access" means Samba mapped the unknown Windows user name to the guest account.
+Check that the global setting is present:
+
+```bash
+grep -n 'map to guest' /etc/samba/smb.conf
+```
+
+It must show `map to guest = never`. `testparm -s` does not print this line,
+because `never` is Samba's built-in default.
+
+### Windows says the user name or password is incorrect
+
+`cmd` and `net use` do not prompt for share credentials; only File Explorer does.
+Pass the account on the command line and let it ask for the password:
+
+```cmd
+net use Z: \\192.168.1.50\software /user:deploy *
+```
+
+If the account was already cached with a wrong password, remove it first:
+
+```cmd
+net use Z: /delete /y
+cmdkey /delete:192.168.1.50
+```
+
+Use those targeted forms rather than `net use * /delete /y`, which removes every
+mapped drive on the PC.
 
 ### Windows cannot contact port 8080
 
