@@ -1,0 +1,20 @@
+[Unit]
+Description=MTES local installer distribution service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=local-dist
+Group=local-dist
+ExecStart=/usr/local/bin/local-dist -listen :8080 -data /srv/software
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/srv/software
+
+[Install]
+WantedBy=multi-user.target

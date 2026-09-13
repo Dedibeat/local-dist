@@ -1,0 +1,8 @@
+/local-dist
+/data/packages/*
+!/data/packages/.gitkeep
+*.exe
+*.msi
+*.zip
+*.msix
+*.iso

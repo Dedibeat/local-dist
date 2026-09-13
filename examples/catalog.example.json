@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "id": "7zip",
+      "name": "7-Zip",
+      "version": "24.09",
+      "type": "exe",
+      "source": "packages/7zip/7z2409-x64.exe",
+      "sha256": "REPLACE_WITH_THE_INSTALLER_SHA256",
+      "install": {
+        "args": ["/S"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\7-Zip\\7z.exe"
+      }
+    },
+    {
+      "id": "vscode-portable",
+      "name": "Visual Studio Code Portable",
+      "version": "1.95.3",
+      "type": "zip",
+      "source": "packages/vscode/vscode-win32-x64.zip",
+      "sha256": "REPLACE_WITH_THE_ARCHIVE_SHA256",
+      "install": {
+        "destination": "C:\\Tools\\VSCode"
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Tools\\VSCode\\Code.exe"
+      }
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "id": "nodejs-lts",
+      "name": "Node.js LTS",
+      "version": "24.21.0",
+      "type": "msi",
+      "source": "packages/nodejs/node-v24.21.0-x64.msi",
+      "upstreamUrl": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-x64.msi",
+      "sha256": "bb0eaee134f9357f22aea915ee793343e627aefc1e66488164bac6915bce2cac",
+      "install": {
+        "args": []
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\nodejs\\node.exe"
+      }
+    },
+    {
+      "id": "git-for-windows",
+      "name": "Git for Windows",
+      "version": "2.55.0.5",
+      "type": "exe",
+      "source": "packages/git/Git-2.55.0.5-64-bit.exe",
+      "upstreamUrl": "https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.5/Git-2.55.0.5-64-bit.exe",
+      "sha256": "d065a4e23c3d9a6b5073d609b5be0830227ec3ca053c083ba385061ddfaf94c6",
+      "install": {
+        "args": ["/VERYSILENT", "/NORESTART", "/NOCANCEL", "/SP-"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\Git\\cmd\\git.exe"
+      }
+    },
+    {
+      "id": "vscode",
+      "name": "Visual Studio Code",
+      "version": "1.137.0",
+      "type": "exe",
+      "source": "packages/vscode/VSCodeSetup-x64-1.137.0.exe",
+      "upstreamUrl": "https://update.code.visualstudio.com/1.137.0/win32-x64/stable",
+      "sha256": "7aa601ca69dfa3ddf020d3df4e35ffaccbb02748cc31587580f215b143586ad3",
+      "install": {
+        "args": ["/VERYSILENT", "/NORESTART", "/MERGETASKS=!runcode"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\Microsoft VS Code\\Code.exe"
+      }
+    },
+    {
+      "id": "w64devkit",
+      "name": "w64devkit GCC toolchain",
+      "version": "2.9.1",
+      "type": "exe",
+      "source": "packages/w64devkit/w64devkit-x64-2.9.1.7z.exe",
+      "upstreamUrl": "https://github.com/skeeto/w64devkit/releases/download/v2.9.1/w64devkit-x64-2.9.1.7z.exe",
+      "sha256": "9208c19755cd4964b7915b9afcf02c66d493a4c870c4b3e83f6c538d9c1237a5",
+      "install": {
+        "args": ["-y", "-oC:\\Tools"],
+        "addToPath": ["C:\\Tools\\w64devkit\\bin"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Tools\\w64devkit\\bin\\gcc.exe"
+      }
+    }
+  ]
+}

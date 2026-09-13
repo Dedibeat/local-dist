@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "rooms": [
+    {
+      "id": "room-208",
+      "name": "Room 208",
+      "complete": false,
+      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit"],
+      "pending": [
+        "Anaconda and Python",
+        "CircuitVerse, MARIE Simulator, and EMU8086",
+        "Code::Blocks",
+        "Dev-C++",
+        "Java JDK",
+        "Linux environment",
+        "MySQL, Microsoft SQL Server, and PostgreSQL",
+        "Arduino IDE and TypeScript",
+        "Raptor",
+        "Probability Systems Analysis requirement needs clarification"
+      ]
+    },
+    {
+      "id": "room-209",
+      "name": "Room 209",
+      "complete": false,
+      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit"],
+      "pending": [
+        "Anaconda",
+        "Android Studio and Flutter SDK",
+        "CircuitVerse, MARIE Simulator, and EMU8086",
+        "Linux environment",
+        "GNU Octave",
+        "MySQL, Microsoft SQL Server, and PostgreSQL",
+        "MongoDB and Chrome",
+        "Arduino IDE and TypeScript",
+        "RStudio",
+        "Raptor",
+        "Algorithm Analysis and Design 1 requirement needs clarification",
+        "Docker, Python, and MySQL requirement needs clarification"
+      ]
+    },
+    {
+      "id": "room-301",
+      "name": "Room 301",
+      "complete": false,
+      "packages": ["git-for-windows", "vscode", "w64devkit"],
+      "pending": [
+        "Anaconda and Python",
+        "Android Studio and Flutter SDK",
+        "Windows SSH client",
+        "CircuitVerse, MARIE Simulator, and EMU8086",
+        "Dev-C++",
+        "Linux dual boot",
+        "Microsoft Office",
+        "MySQL, Microsoft SQL Server, and PostgreSQL",
+        "Algorithm Analysis and Design 1 requirement needs clarification",
+        "Probability Systems Analysis requirement needs clarification"
+      ]
+    },
+    {
+      "id": "room-302",
+      "name": "Room 302",
+      "complete": false,
+      "packages": ["vscode"],
+      "pending": [
+        "Anaconda and Python",
+        "Android Studio and Flutter SDK",
+        "CircuitVerse, MARIE Simulator, and EMU8086",
+        "Dev-C++",
+        "MySQL and Microsoft SQL Server",
+        "PostgreSQL Server",
+        "Raptor",
+        "Probability Systems Analysis requirement needs clarification"
+      ]
+    },
+    {
+      "id": "room-407",
+      "name": "Room 407",
+      "complete": false,
+      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit"],
+      "pending": [
+        "Anaconda",
+        "Dev-C++",
+        "Linux dual boot",
+        "GNU Octave",
+        "Arduino IDE and TypeScript"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+[software]
+    path = /srv/software
+    browseable = yes
+    read only = yes
+    guest ok = no
+    valid users = deploy
+    force group = local-dist
