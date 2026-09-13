@@ -13,7 +13,16 @@ import (
 func main() {
 	listen := flag.String("listen", envOr("LOCAL_DIST_LISTEN", ":8080"), "HTTP listen address")
 	dataDir := flag.String("data", envOr("LOCAL_DIST_DATA", "./data"), "directory containing catalog.json, rooms.json, and packages/")
+	logPath := flag.String("log", envOr("LOCAL_DIST_LOG", ""), "append logs to this file instead of stderr")
 	flag.Parse()
+	if *logPath != "" {
+		logFile, err := os.OpenFile(*logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o640)
+		if err != nil {
+			log.Fatalf("open log file: %v", err)
+		}
+		defer logFile.Close()
+		log.SetOutput(logFile)
+	}
 
 	store, err := provider.Load(*dataDir)
 	if err != nil {

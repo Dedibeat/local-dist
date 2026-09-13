@@ -1,6 +1,6 @@
 # MTES Local Installer Server
 
-This project lets one Linux computer store software installers for many Windows computers on the same local network.
+This project lets a Linux or Windows computer store software installers for many Windows computers on the same local network.
 
 For example, a technician can run one command on a computer in Room 302:
 
@@ -11,8 +11,8 @@ For example, a technician can run one command on a computer in Room 302:
 The computer asks the server which programs Room 302 needs, downloads them, checks that the files are correct, and installs them silently.
 
 ```text
-Linux server                         Windows computer
-----------------                    ----------------
+Linux or Windows server              Windows computer
+-----------------------              ----------------
 Room 302 package list  ----------->  Read the list
 Installer files        ----------->  Check and install them
 ```
@@ -25,8 +25,8 @@ The Windows computers do not need Python, Node.js, Chocolatey, or a custom backg
 - A package list in `data/catalog.json`
 - A room list in `data/rooms.json`
 - A Windows installation script
-- A Samba configuration example for the `\\mtes-pkg\software` network share
-- Docker and systemd options for keeping the server running
+- Samba and Windows SMB options for the `\\mtes-pkg\software` network share
+- Docker, systemd, and Windows Task Scheduler options for keeping the server running
 
 This workspace currently contains Node.js LTS, Git for Windows, Visual Studio Code, w64devkit, Python, Eclipse Temurin JDK 21, 7-Zip, Google Chrome, Arduino IDE, GNU Octave, Anaconda, Code::Blocks, Embarcadero Dev-C++, Android Studio, Flutter SDK, R, RStudio Desktop, MongoDB Community Server, OpenSSH Client, Docker Desktop, TypeScript, .NET Desktop Runtime, and RAPTOR. Large installer files are ignored by Git. After making a new clone, restore the approved files and verify their checksums with:
 
@@ -38,7 +38,7 @@ go run ./cmd/fetch-packages -data ./data
 
 | Word | Meaning |
 | --- | --- |
-| Server | The Linux computer that stores and sends installers |
+| Server | The Linux or Windows computer that stores and sends installers |
 | Client | A Windows computer that receives the software |
 | Package | One installer and its information, such as 7-Zip version 24.09 |
 | Catalog | The list of all packages on the server |
@@ -51,11 +51,11 @@ go run ./cmd/fetch-packages -data ./data
 
 You need:
 
-- One Ubuntu or Debian Linux server
+- One Ubuntu/Debian server or a Windows 10/11 server PC
 - Windows computers on the same network
-- Administrator access on the Linux and Windows computers
-- Go 1.23 or newer on the Linux server
-- This project copied or cloned onto the Linux server
+- Administrator access on the server and Windows client computers
+- Go 1.23 or newer on the build machine, or a prebuilt provider executable
+- This project copied or cloned onto the server
 
 Commands beginning with `sudo` ask for the Linux administrator password. Run Linux commands in Terminal. Run Windows commands in an **Administrator Command Prompt**.
 
@@ -171,6 +171,76 @@ If the Linux firewall is active, allow the provider port:
 
 ```bash
 sudo ufw allow 8080/tcp
+```
+
+## Alternative Part 2: Install the provider on Windows
+
+A Windows 10 or Windows 11 PC can host the same catalog and package files. It
+runs the Go provider as `SYSTEM` at startup and exposes a read-only authenticated
+SMB share. Use a PC that remains powered on and has a stable IP address or DNS
+name. The installer opens ports 8080 and 445 only to the local subnet.
+
+First restore the approved package files under `data\packages`. If this checkout
+does not contain them, download and verify them before continuing:
+
+```powershell
+go run ./cmd/fetch-packages -data ./data
+```
+
+Open **Windows PowerShell as Administrator** in the project directory and run:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\deployments\install-windows-server.ps1
+```
+
+The script builds `local-dist.exe`, copies the provider data to
+`C:\ProgramData\MTES\LocalDistServer`, and asks for a password when it creates
+the local `localdist-deploy` account. It then creates:
+
+- the `\\SERVER-PC\software` read-only share;
+- the `MTES LocalDist Provider` scheduled task;
+- local-subnet firewall rules for HTTP and SMB;
+- `C:\ProgramData\MTES\LocalDistServer\logs\provider.log`.
+
+To use a prebuilt Windows executable instead of installing Go on the server PC,
+build it on a machine with Go, copy it to the server PC, and pass its path:
+
+```bash
+GOOS=windows GOARCH=amd64 go build -trimpath -o local-dist.exe ./cmd/local-dist
+```
+
+```powershell
+.\deployments\install-windows-server.ps1 -BinaryPath C:\Temp\local-dist.exe
+```
+
+Test the provider locally:
+
+```powershell
+Invoke-RestMethod http://localhost:8080/healthz
+```
+
+On another Windows PC, open **Command Prompt as Administrator**, connect with
+the account and password created above, and deploy a room:
+
+```cmd
+net use Z: \\SERVER-PC\software /user:SERVER-PC\localdist-deploy *
+Z:\scripts\setup.cmd room-208 -ServerUrl http://SERVER-PC:8080
+```
+
+Replace `SERVER-PC` with the host name or stable IP address of the Windows
+server. Each server is independent; choose that same PC in both the SMB path and
+`-ServerUrl`. Skip Part 3 because the Windows installer already created the
+network share.
+
+To update a Windows server, pull the repository changes, restore any new package
+payloads, and rerun `install-windows-server.ps1`. Existing payloads and the share
+account are retained. Check or restart the provider with:
+
+```powershell
+Get-ScheduledTask -TaskName 'MTES LocalDist Provider'
+Stop-ScheduledTask -TaskName 'MTES LocalDist Provider'
+Start-ScheduledTask -TaskName 'MTES LocalDist Provider'
+Get-Content C:\ProgramData\MTES\LocalDistServer\logs\provider.log -Tail 50
 ```
 
 ## Part 3: Create the Windows network share

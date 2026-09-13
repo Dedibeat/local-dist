@@ -2,9 +2,10 @@
 
 ## Purpose and layout
 
-This project distributes approved Windows installers from a Linux server to
-computers on a trusted local network. Keep the provider small and read-only,
-and keep the client compatible with built-in Windows PowerShell 5.1.
+This project distributes approved Windows installers from a Linux or Windows
+server to computers on a trusted local network. Keep the provider small and
+read-only, and keep Windows scripts compatible with built-in Windows PowerShell
+5.1.
 
 - `cmd/local-dist/`: HTTP server entry point and runtime configuration.
 - `cmd/fetch-packages/`: command for fetching and verifying catalog installers.
@@ -14,7 +15,7 @@ and keep the client compatible with built-in Windows PowerShell 5.1.
 - `data/rooms.json`: room assignments and outstanding requirements.
 - `data/packages/`: local installer payloads, ignored by Git except `.gitkeep`.
 - `scripts/`: Windows installation client and Linux package-copy helper.
-- `deployments/`, `Dockerfile`, and `compose.yaml`: deployment examples.
+- `deployments/`, `Dockerfile`, and `compose.yaml`: Linux and Windows deployment examples.
 - `reference/`: original room requirements and planning notes.
 - `README.md`: operator instructions; update it when behavior or commands change.
 
