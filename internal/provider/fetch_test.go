@@ -17,7 +17,10 @@ import (
 func TestFetchPackagesDownloadsAndVerifiesMissingFile(t *testing.T) {
 	payload := []byte("trusted installer")
 	hash := sha256.Sum256(payload)
-	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.UserAgent() != "local-dist/1.0" {
+			t.Errorf("unexpected user agent %q", r.UserAgent())
+		}
 		_, _ = w.Write(payload)
 	}))
 	defer server.Close()

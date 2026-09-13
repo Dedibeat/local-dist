@@ -170,8 +170,8 @@ func validatePackage(pkg Package) error {
 	if pkg.Name == "" || pkg.Version == "" {
 		return fmt.Errorf("name and version are required")
 	}
-	if pkg.Type != "msi" && pkg.Type != "exe" && pkg.Type != "zip" && pkg.Type != "portable" {
-		return fmt.Errorf("type must be msi, exe, zip, or portable")
+	if pkg.Type != "msi" && pkg.Type != "exe" && pkg.Type != "zip" && pkg.Type != "portable" && pkg.Type != "npm" {
+		return fmt.Errorf("type must be msi, exe, zip, portable, or npm")
 	}
 	if err := validateSource(pkg.Source); err != nil {
 		return err

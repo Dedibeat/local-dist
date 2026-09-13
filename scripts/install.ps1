@@ -102,6 +102,13 @@ function Install-Package {
             New-Item -ItemType Directory -Force -Path $destination | Out-Null
             Copy-Item -LiteralPath $Installer -Destination $destination -Force
         }
+        'npm' {
+            $npm = Join-Path $env:ProgramFiles 'nodejs\npm.cmd'
+            if (-not (Test-Path -LiteralPath $npm -PathType Leaf)) {
+                throw "Package '$($Package.id)' requires Node.js and npm."
+            }
+            $process = Start-Process -FilePath $npm -ArgumentList @('install', '--global', '--offline', '--no-audit', '--no-fund', $Installer) -Wait -PassThru
+        }
         default {
             throw "Unsupported package type '$($Package.type)'."
         }

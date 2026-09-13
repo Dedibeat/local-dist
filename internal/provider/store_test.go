@@ -48,6 +48,16 @@ func TestValidateSource(t *testing.T) {
 	}
 }
 
+func TestValidatePackageAcceptsNPM(t *testing.T) {
+	pkg := Package{
+		ID: "typescript", Name: "TypeScript", Version: "1.0", Type: "npm",
+		Source: "packages/typescript/typescript-1.0.tgz", SHA256: strings.Repeat("0", 64),
+	}
+	if err := validatePackage(pkg); err != nil {
+		t.Fatalf("validate npm package: %v", err)
+	}
+}
+
 func TestReadJSONRejectsTrailingContent(t *testing.T) {
 	for _, suffix := range []string{` {"schemaVersion":2}`, " garbage"} {
 		filename := filepath.Join(t.TempDir(), "catalog.json")

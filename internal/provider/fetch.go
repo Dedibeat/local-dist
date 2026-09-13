@@ -78,6 +78,7 @@ func downloadPackage(ctx context.Context, client *http.Client, pkg Package, targ
 	if err != nil {
 		return fmt.Errorf("create request for %s: %w", pkg.ID, err)
 	}
+	request.Header.Set("User-Agent", "local-dist/1.0")
 	response, err := client.Do(request)
 	if err != nil {
 		return fmt.Errorf("download %s: %w", pkg.ID, err)

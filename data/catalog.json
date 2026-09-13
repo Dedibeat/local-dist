@@ -65,6 +65,300 @@
         "type": "file",
         "path": "C:\\Tools\\w64devkit\\bin\\gcc.exe"
       }
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "version": "3.14.7",
+      "type": "exe",
+      "source": "packages/python/python-3.14.7-amd64.exe",
+      "upstreamUrl": "https://www.python.org/ftp/python/3.14.7/python-3.14.7-amd64.exe",
+      "sha256": "9d9eb2709ef81bf5cd30db3c2096bdbc4ea10087c22e62f27d356b36f6ae9649",
+      "install": {
+        "args": ["/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\Python314\\python.exe"
+      }
+    },
+    {
+      "id": "temurin-jdk-21",
+      "name": "Eclipse Temurin JDK 21",
+      "version": "21.0.12.1+1-LTS",
+      "type": "msi",
+      "source": "packages/temurin-jdk-21/OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.msi",
+      "upstreamUrl": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.msi",
+      "sha256": "454cfd334b9ca91c96dd8c2de97fcef6b9f1f98be9172ff076711f1c6b44e4e0",
+      "install": {
+        "addToPath": ["C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.12.1-hotspot\\bin"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.12.1-hotspot\\bin\\java.exe"
+      }
+    },
+    {
+      "id": "7zip",
+      "name": "7-Zip",
+      "version": "26.03",
+      "type": "exe",
+      "source": "packages/7zip/7z2603-x64.exe",
+      "upstreamUrl": "https://github.com/ip7z/7zip/releases/download/26.03/7z2603-x64.exe",
+      "sha256": "0859c524b8a63551848f0c246abddcb1d0b7b656b0fbfe879f8d85e61a9e6edd",
+      "install": {
+        "args": ["/S"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\7-Zip\\7z.exe"
+      }
+    },
+    {
+      "id": "google-chrome",
+      "name": "Google Chrome",
+      "version": "153.0.8010.37",
+      "type": "msi",
+      "source": "packages/google-chrome/googlechromestandaloneenterprise64.msi",
+      "upstreamUrl": "https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise64.msi",
+      "sha256": "7baa1a89de55e8ba68d3d0c912fe677ddd807e91fb0ee4532c6b6cc527197ddb",
+      "install": {},
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      }
+    },
+    {
+      "id": "arduino-ide",
+      "name": "Arduino IDE",
+      "version": "2.3.10",
+      "type": "msi",
+      "source": "packages/arduino-ide/arduino-ide_2.3.10_Windows_64bit.msi",
+      "upstreamUrl": "https://github.com/arduino/arduino-ide/releases/download/2.3.10/arduino-ide_2.3.10_Windows_64bit.msi",
+      "sha256": "aebbd1efeac5cfb02a6cad0d93af8221054fc983a5b3c5ce6da8a6bfb9425165",
+      "install": {},
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\Arduino IDE\\Arduino IDE.exe"
+      }
+    },
+    {
+      "id": "gnu-octave",
+      "name": "GNU Octave",
+      "version": "11.3.0",
+      "type": "exe",
+      "source": "packages/gnu-octave/octave-11.3.0-w64-64-installer.exe",
+      "upstreamUrl": "https://github.com/gnu-octave/octave/releases/download/release-11-3-0/octave-11.3.0-w64-64-installer.exe",
+      "sha256": "84974180f7d0f7c869bc3a070338fed21005fa8cdf9fed783494f250dd35cb4f",
+      "install": {
+        "args": ["/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\GNU Octave\\Octave-11.3.0\\mingw64\\bin\\octave-cli.exe"
+      }
+    },
+    {
+      "id": "anaconda",
+      "name": "Anaconda Distribution",
+      "version": "2026.07-1",
+      "type": "exe",
+      "source": "packages/anaconda/Anaconda3-2026.07-1-Windows-x86_64.exe",
+      "upstreamUrl": "https://repo.anaconda.com/archive/Anaconda3-2026.07-1-Windows-x86_64.exe",
+      "sha256": "b545f4bd8ab3bf32d99002a0779a887668ebfe479ee32ecbf060375670d5ee09",
+      "install": {
+        "args": ["/S", "/InstallationType=AllUsers", "/AddToPath=0", "/RegisterPython=0"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\ProgramData\\anaconda3\\python.exe"
+      }
+    },
+    {
+      "id": "codeblocks",
+      "name": "Code::Blocks with MinGW",
+      "version": "25.03",
+      "type": "exe",
+      "source": "packages/codeblocks/codeblocks-25.03mingw-setup.exe",
+      "upstreamUrl": "https://sourceforge.net/projects/codeblocks/files/Binaries/25.03/Windows/codeblocks-25.03mingw-setup.exe/download",
+      "sha256": "8712227526eb3bb26c90dd5c78301b3fa32bf5869a43294bbf4e9c5512c52792",
+      "install": {
+        "args": ["/S"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\CodeBlocks\\codeblocks.exe"
+      }
+    },
+    {
+      "id": "embarcadero-dev-cpp",
+      "name": "Embarcadero Dev-C++ with TDM-GCC",
+      "version": "6.3",
+      "type": "exe",
+      "source": "packages/embarcadero-dev-cpp/Embarcadero_Dev-Cpp_6.3_TDM-GCC_9.2_Setup.exe",
+      "upstreamUrl": "https://github.com/Embarcadero/Dev-Cpp/releases/download/v6.3/Embarcadero_Dev-Cpp_6.3_TDM-GCC_9.2_Setup.exe",
+      "sha256": "9ea2f0237e5c72d485f9fa29def3f0a11c51f8b252f650be533e09a5e2ada247",
+      "install": {
+        "args": ["/S"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files (x86)\\Embarcadero Dev-C++\\devcpp.exe"
+      }
+    },
+    {
+      "id": "android-studio",
+      "name": "Android Studio",
+      "version": "2026.1.4.7",
+      "type": "zip",
+      "source": "packages/android-studio/android-studio-quail4-windows.zip",
+      "upstreamUrl": "https://edgedl.me.gvt1.com/android/studio/ide-zips/2026.1.4.7/android-studio-quail4-windows.zip",
+      "sha256": "fabc885015bd67182f4f49da8e3efbb3b60038b2dfda632cf2d29363ffb1e04e",
+      "install": {
+        "destination": "C:\\Tools",
+        "addToPath": ["C:\\Tools\\android-studio\\bin"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Tools\\android-studio\\bin\\studio64.exe"
+      }
+    },
+    {
+      "id": "flutter-sdk",
+      "name": "Flutter SDK",
+      "version": "3.47.4",
+      "type": "zip",
+      "source": "packages/flutter-sdk/flutter_windows_3.47.4-stable.zip",
+      "upstreamUrl": "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.47.4-stable.zip",
+      "sha256": "31173300481bd06e377fd55ee84214689648b1817563efd7b450b7b78bdf351a",
+      "install": {
+        "destination": "C:\\Tools",
+        "addToPath": ["C:\\Tools\\flutter\\bin"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Tools\\flutter\\bin\\flutter.bat"
+      }
+    },
+    {
+      "id": "r-project",
+      "name": "R for Windows",
+      "version": "4.5.2",
+      "type": "exe",
+      "source": "packages/r-project/R-4.5.2-win.exe",
+      "upstreamUrl": "https://cloud.r-project.org/bin/windows/base/old/4.5.2/R-4.5.2-win.exe",
+      "sha256": "fcbd6436e1e3f058766354ebab2a21004fe8c21298c7c3eaf3d487e59685acf7",
+      "install": {
+        "args": ["/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\R\\R-4.5.2\\bin\\R.exe"
+      }
+    },
+    {
+      "id": "rstudio",
+      "name": "RStudio Desktop",
+      "version": "2026.09.0+174",
+      "type": "exe",
+      "source": "packages/rstudio/RStudio-2026.09.0-174.exe",
+      "upstreamUrl": "https://download1.rstudio.org/electron/windows/RStudio-2026.09.0-174.exe",
+      "sha256": "e6b5a3b1028b7cc8d2abe7375aae4813a791898899d81d64468185349e41491c",
+      "install": {
+        "args": ["/allusers", "/S"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\RStudio\\bin\\rstudio.exe"
+      }
+    },
+    {
+      "id": "mongodb-server",
+      "name": "MongoDB Community Server",
+      "version": "8.2.3",
+      "type": "msi",
+      "source": "packages/mongodb-server/mongodb-windows-x86_64-8.2.3-signed.msi",
+      "upstreamUrl": "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-8.2.3-signed.msi",
+      "sha256": "dbad91532fd5f5bb5b42818ce7a644dd603a388926303b306e23ef29a640e849",
+      "install": {
+        "args": ["ADDLOCAL=ServerService", "REBOOT=ReallySuppress"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\MongoDB\\Server\\8.2\\bin\\mongod.exe"
+      }
+    },
+    {
+      "id": "openssh-client",
+      "name": "OpenSSH Client for Windows",
+      "version": "10.0.0.0",
+      "type": "msi",
+      "source": "packages/openssh-client/OpenSSH-Win64-v10.0.0.0.msi",
+      "upstreamUrl": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/10.0.0.0p2-Preview/OpenSSH-Win64-v10.0.0.0.msi",
+      "sha256": "ddec9c53864280759cf9f74791cefd387100e3946aa849a1c138a4ed1b96b7d9",
+      "install": {
+        "args": ["ADDLOCAL=Client"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\OpenSSH\\ssh.exe"
+      }
+    },
+    {
+      "id": "docker-desktop",
+      "name": "Docker Desktop",
+      "version": "4.90.0",
+      "type": "exe",
+      "source": "packages/docker-desktop/Docker Desktop Installer.exe",
+      "upstreamUrl": "https://desktop.docker.com/win/main/amd64/238679/Docker%20Desktop%20Installer.exe",
+      "sha256": "2ecc54255702ffbf2e2779cb35ebecde535a0b31e4223171be2195dc318ebd3d",
+      "install": {
+        "args": ["install", "--accept-license", "--quiet"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe"
+      }
+    },
+    {
+      "id": "typescript",
+      "name": "TypeScript",
+      "version": "7.0.2",
+      "type": "npm",
+      "source": "packages/typescript/typescript-7.0.2.tgz",
+      "upstreamUrl": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "sha256": "da2513f4b95176d6dde8b51aab7afe8a927656c9d277369793f77f7e59371c08",
+      "install": {}
+    },
+    {
+      "id": "dotnet-desktop-runtime-8",
+      "name": ".NET Desktop Runtime 8",
+      "version": "8.0.31",
+      "type": "exe",
+      "source": "packages/dotnet-desktop-runtime-8/windowsdesktop-runtime-8.0.31-win-x64.exe",
+      "upstreamUrl": "https://download.microsoft.com/download/7e7e34b1-b352-43d1-a6de-d5d3460bee5e/855a3161-903f-4e3a-a9d7-79d5579c82d2/windowsdesktop-runtime-8.0.31-win-x64.exe",
+      "sha256": "c375dfd80a967405cfeff634912c1fccc56261ce3d9209ea473f60a21184d1cc",
+      "install": {
+        "args": ["/install", "/quiet", "/norestart"]
+      },
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\8.0.31\\PresentationFramework.dll"
+      }
+    },
+    {
+      "id": "raptor",
+      "name": "RAPTOR Flowchart Interpreter",
+      "version": "2025-07-10",
+      "type": "msi",
+      "source": "packages/raptor/wixedit_raptor.msi",
+      "upstreamUrl": "https://raptor.martincarlisle.com/wixedit_raptor.msi",
+      "sha256": "16087b2bdd0d396e1624114db48088c00c5824163b4f557f87990ebd4a88dbbf",
+      "install": {},
+      "detect": {
+        "type": "file",
+        "path": "C:\\Program Files\\RAPTOR\\RAPTOR.exe"
+      }
     }
   ]
 }

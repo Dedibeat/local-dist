@@ -28,7 +28,7 @@ The Windows computers do not need Python, Node.js, Chocolatey, or a custom backg
 - A Samba configuration example for the `\\mtes-pkg\software` network share
 - Docker and systemd options for keeping the server running
 
-This workspace currently contains the first installer batch: Node.js LTS, Git for Windows, Visual Studio Code, and w64devkit. Large installer files are ignored by Git. After making a new clone, restore the approved files and verify their checksums with:
+This workspace currently contains Node.js LTS, Git for Windows, Visual Studio Code, w64devkit, Python, Eclipse Temurin JDK 21, 7-Zip, Google Chrome, Arduino IDE, GNU Octave, Anaconda, Code::Blocks, Embarcadero Dev-C++, Android Studio, Flutter SDK, R, RStudio Desktop, MongoDB Community Server, OpenSSH Client, Docker Desktop, TypeScript, .NET Desktop Runtime, and RAPTOR. Large installer files are ignored by Git. After making a new clone, restore the approved files and verify their checksums with:
 
 ```bash
 go run ./cmd/fetch-packages -data ./data
