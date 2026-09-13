@@ -1,8 +1,8 @@
 Paste into an elevated Command Prompt on the new PC:                                                                                      
                                                                                                                                            
  ```cmd                                                                                                                                    
-net use \\10.3.122.102\software-scripts /user:dedibeat RoomDeploy-2026 && powershell -NoProfile -ExecutionPolicy Bypass -File           
- \\10.3.122.102\software-scripts\install.ps1 room-302 -ServerUrl http://10.3.122.102:8080                                                
+net use Z: /delete /y >nul 2>&1 & net use Z: \\10.3.122.102\software-scripts /user:dedibeat RoomDeploy-2026 && Z:\setup.cmd room-302    
+ -ServerUrl http://10.3.122.102:8080                                             
  ```                                                                                                                                       
                                                                                                                                            
  It prompts Type the password for \\10.3.122.102\software-scripts: — type RoomDeploy-2026.                                                 
