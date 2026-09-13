@@ -58,6 +58,36 @@ func TestValidatePackageAcceptsNPM(t *testing.T) {
 	}
 }
 
+func TestValidatePackageDetection(t *testing.T) {
+	base := Package{
+		ID: "demo", Name: "Demo", Version: "1.0", Type: "exe",
+		Source: "packages/demo/setup.exe", SHA256: strings.Repeat("0", 64),
+	}
+
+	for _, detection := range []*Detection{
+		{Type: "file", Path: `C:\Program Files\Demo\demo.exe`},
+		{Type: "command", Path: `%APPDATA%\Demo\demo.cmd`, Args: []string{"--version"}},
+	} {
+		pkg := base
+		pkg.Detect = detection
+		if err := validatePackage(pkg); err != nil {
+			t.Fatalf("rejected detection %#v: %v", detection, err)
+		}
+	}
+
+	for _, detection := range []*Detection{
+		{Type: "registry", Path: `HKLM:\Software\Demo`},
+		{Type: "file"},
+		{Type: "file", Path: `C:\Demo.exe`, Args: []string{"--version"}},
+	} {
+		pkg := base
+		pkg.Detect = detection
+		if err := validatePackage(pkg); err == nil {
+			t.Fatalf("accepted invalid detection %#v", detection)
+		}
+	}
+}
+
 func TestValidatePackageStartMenu(t *testing.T) {
 	base := Package{
 		ID: "demo", Name: "Demo", Version: "1.0", Type: "exe",

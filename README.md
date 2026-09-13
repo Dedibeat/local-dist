@@ -361,6 +361,7 @@ Windows will:
 3. Compare its SHA-256 fingerprint with the catalog.
 4. Skip software that the detection rule says is already installed.
 5. Install the remaining software.
+6. Verify the expected program file after every installation.
 
 After DNS is configured, the shorter command is:
 
@@ -393,7 +394,10 @@ file, pass `-LogPath`:
 The provider does not receive logs automatically; copy or send the resulting
 file to the operator when a Windows installation needs investigation.
 
-Detection checks whether a file exists; it does not compare installed versions. To update or reinstall software that is already detected, add `-Force`:
+Detection checks whether a file exists; it does not compare installed versions.
+After an installer exits successfully, SETUP checks that same file and fails if
+it is missing. To update or reinstall software that is already detected, add
+`-Force`:
 
 ```cmd
 \\mtes-pkg\software\scripts\setup.cmd room-302 -Force
@@ -401,11 +405,18 @@ Detection checks whether a file exists; it does not compare installed versions. 
 
 This reinstalls every package in the selected room plan. The script returns exit code `0` on success, `3010` when installation succeeded but Windows needs a restart, and `1` on failure. Configured PATH entries are also repaired for already-installed packages.
 
-RAPTOR and Dev-C++ are given all-users Start-menu shortcuts by the client. For
-an older RAPTOR installation that was created per-user, run once with `-Force`
-so the `ALLUSERS=1` MSI setting can migrate it. If Windows Installer reports
-error 1638, remove the old per-user RAPTOR installation from **Installed apps**
-while signed in as the account that installed it, then run the command again.
+Command-line packages can use a `command` detection rule. SETUP runs the command
+and considers it installed only when it exits successfully. TypeScript uses
+`tsc.cmd --version`, which also verifies that its Windows compiler package is
+present; a leftover launcher file by itself is not accepted as a working install.
+
+Arduino IDE, RAPTOR, and Dev-C++ are given all-users Start-menu shortcuts by the
+client. Arduino IDE and RAPTOR are also installed in machine-wide MSI mode. For
+an older RAPTOR copy that was created per-user, run once with `-Force`. Windows
+Installer cannot change an existing Arduino installation from per-user to
+machine-wide: remove that old copy from **Installed apps** while signed in as the
+account that installed it, then run SETUP again. Use the same remove-and-rerun
+procedure if Windows Installer reports error 1638 for RAPTOR.
 
 ## Package types
 
@@ -582,13 +593,14 @@ Copy the new value into `catalog.json`, but only after confirming that the insta
 
 Its silent arguments are probably wrong. Read the software publisher's deployment documentation and update `install.args` in `catalog.json`.
 
-### RAPTOR or Dev-C++ is installed but missing from Start search
+### Arduino IDE, RAPTOR, or Dev-C++ is installed but missing from Start search
 
 The catalog uses the verified executable locations below and repairs a common
 all-users Start-menu shortcut on every setup run:
 
 | Package | Executable |
 | --- | --- |
+| Arduino IDE | `C:\Program Files\arduino-ide\Arduino IDE.exe` |
 | RAPTOR | `C:\Program Files (x86)\RAPTOR_Avalonia\RAPTOR.EXE` |
 | Dev-C++ | `C:\Program Files (x86)\Embarcadero\Dev-Cpp\devcpp.exe` |
 

@@ -91,11 +91,11 @@
       "upstreamUrl": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.msi",
       "sha256": "454cfd334b9ca91c96dd8c2de97fcef6b9f1f98be9172ff076711f1c6b44e4e0",
       "install": {
-        "addToPath": ["C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.12.1-hotspot\\bin"]
+        "addToPath": ["C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.12.101-hotspot\\bin"]
       },
       "detect": {
         "type": "file",
-        "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.12.1-hotspot\\bin\\java.exe"
+        "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.12.101-hotspot\\bin\\java.exe"
       }
     },
     {
@@ -136,10 +136,16 @@
       "source": "packages/arduino-ide/arduino-ide_2.3.10_Windows_64bit.msi",
       "upstreamUrl": "https://github.com/arduino/arduino-ide/releases/download/2.3.10/arduino-ide_2.3.10_Windows_64bit.msi",
       "sha256": "aebbd1efeac5cfb02a6cad0d93af8221054fc983a5b3c5ce6da8a6bfb9425165",
-      "install": {},
+      "install": {
+        "args": ["ALLUSERS=1", "MSIINSTALLPERUSER="],
+        "startMenu": {
+          "folder": "Arduino IDE",
+          "name": "Arduino IDE.lnk"
+        }
+      },
       "detect": {
         "type": "file",
-        "path": "C:\\Program Files\\Arduino IDE\\Arduino IDE.exe"
+        "path": "C:\\Program Files\\arduino-ide\\Arduino IDE.exe"
       }
     },
     {
@@ -332,7 +338,26 @@
       "source": "packages/typescript/typescript-7.0.2.tgz",
       "upstreamUrl": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
       "sha256": "da2513f4b95176d6dde8b51aab7afe8a927656c9d277369793f77f7e59371c08",
-      "install": {}
+      "install": {},
+      "detect": {
+        "type": "file",
+        "path": "%APPDATA%\\npm\\tsc.cmd"
+      }
+    },
+    {
+      "id": "typescript-win32-x64",
+      "name": "TypeScript Windows x64 compiler",
+      "version": "7.0.2",
+      "type": "npm",
+      "source": "packages/typescript/typescript-typescript-win32-x64-7.0.2.tgz",
+      "upstreamUrl": "https://registry.npmjs.org/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz",
+      "sha256": "61fc4e141d2bc687db580e71bbfa63b9c209f0310645d82ca1b457eb3a24fd19",
+      "install": {},
+      "detect": {
+        "type": "command",
+        "path": "%APPDATA%\\npm\\tsc.cmd",
+        "args": ["--version"]
+      }
     },
     {
       "id": "dotnet-desktop-runtime-8",

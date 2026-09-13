@@ -48,8 +48,9 @@ type StartMenuEntry struct {
 }
 
 type Detection struct {
-	Type string `json:"type"`
-	Path string `json:"path"`
+	Type string   `json:"type"`
+	Path string   `json:"path"`
+	Args []string `json:"args,omitempty"`
 }
 
 type RoomsFile struct {
@@ -191,8 +192,16 @@ func validatePackage(pkg Package) error {
 	if (pkg.Type == "zip" || pkg.Type == "portable") && pkg.Install.Destination == "" {
 		return fmt.Errorf("install.destination is required for %s packages", pkg.Type)
 	}
-	if pkg.Detect != nil && (pkg.Detect.Type != "file" || pkg.Detect.Path == "") {
-		return fmt.Errorf("detect supports only a non-empty file path")
+	if pkg.Detect != nil {
+		if pkg.Detect.Type != "file" && pkg.Detect.Type != "command" {
+			return fmt.Errorf("detect.type must be file or command")
+		}
+		if pkg.Detect.Path == "" {
+			return fmt.Errorf("detect.path must not be empty")
+		}
+		if pkg.Detect.Type == "file" && len(pkg.Detect.Args) > 0 {
+			return fmt.Errorf("detect.args is supported only for command detection")
+		}
 	}
 	if pkg.Install.StartMenu != nil {
 		if pkg.Detect == nil || pkg.Detect.Type != "file" {

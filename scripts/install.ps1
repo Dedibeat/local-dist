@@ -81,8 +81,47 @@ function Test-PackageInstalled {
         Write-Host "Detection for $($Package.id): $installed ($path)"
         return $installed
     }
+    if ($Package.detect.type -eq 'command') {
+        $path = [Environment]::ExpandEnvironmentVariables($Package.detect.path)
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            Write-Host "Detection for $($Package.id): False (command is missing: $path)"
+            return $false
+        }
+
+        $startOptions = @{
+            FilePath = $path
+            Wait = $true
+            PassThru = $true
+        }
+        if ($null -ne $Package.detect.args -and @($Package.detect.args).Count -gt 0) {
+            $startOptions.ArgumentList = @($Package.detect.args)
+        }
+        try {
+            $process = Start-Process @startOptions
+            $installed = $process.ExitCode -eq 0
+            Write-Host "Detection for $($Package.id): $installed (command exit code $($process.ExitCode): $path)"
+            return $installed
+        }
+        catch {
+            Write-Host "Detection for $($Package.id): False (command failed: $path)"
+            return $false
+        }
+    }
     Write-Host "Detection for $($Package.id): unsupported rule type '$($Package.detect.type)'"
     return $false
+}
+
+function Assert-PackageInstalled {
+    param([object]$Package)
+
+    if ($null -eq $Package.detect) {
+        throw "Package '$($Package.id)' has no detection rule; installation cannot be verified."
+    }
+
+    if (-not (Test-PackageInstalled -Package $Package)) {
+        $detectPath = [Environment]::ExpandEnvironmentVariables($Package.detect.path)
+        throw "Installer for '$($Package.id)' exited successfully, but its '$($Package.detect.type)' verification failed: $detectPath"
+    }
 }
 
 function Get-PackageFile {
@@ -257,9 +296,7 @@ try {
         else {
             $installer = Get-PackageFile -Package $package
             Install-Package -Package $package -Installer $installer
-            if ($null -ne $package.detect -and -not (Test-PackageInstalled -Package $package)) {
-                Write-Warning "Installer completed for '$($package.id)', but its detection path is not present."
-            }
+            Assert-PackageInstalled -Package $package
         }
         Update-PackagePath -Package $package
         Ensure-StartMenuShortcut -Package $package

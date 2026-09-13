@@ -5,7 +5,7 @@
       "id": "room-208",
       "name": "Room 208",
       "complete": false,
-      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit", "python", "temurin-jdk-21", "arduino-ide", "anaconda", "codeblocks", "embarcadero-dev-cpp", "typescript", "dotnet-desktop-runtime-8", "raptor"],
+      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit", "python", "temurin-jdk-21", "arduino-ide", "anaconda", "codeblocks", "embarcadero-dev-cpp", "typescript", "typescript-win32-x64", "dotnet-desktop-runtime-8", "raptor"],
       "pending": [
         "CircuitVerse, MARIE Simulator, and EMU8086",
         "Linux environment",
@@ -17,7 +17,7 @@
       "id": "room-209",
       "name": "Room 209",
       "complete": false,
-      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit", "google-chrome", "arduino-ide", "gnu-octave", "anaconda", "android-studio", "flutter-sdk", "r-project", "rstudio", "mongodb-server", "python", "docker-desktop", "typescript", "dotnet-desktop-runtime-8", "raptor"],
+      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit", "google-chrome", "arduino-ide", "gnu-octave", "anaconda", "android-studio", "flutter-sdk", "r-project", "rstudio", "mongodb-server", "python", "docker-desktop", "typescript", "typescript-win32-x64", "dotnet-desktop-runtime-8", "raptor"],
       "pending": [
         "CircuitVerse, MARIE Simulator, and EMU8086",
         "Linux environment",
@@ -56,7 +56,7 @@
       "id": "room-407",
       "name": "Room 407",
       "complete": false,
-      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit", "arduino-ide", "gnu-octave", "anaconda", "typescript"],
+      "packages": ["nodejs-lts", "git-for-windows", "vscode", "w64devkit", "arduino-ide", "gnu-octave", "anaconda", "typescript", "typescript-win32-x64"],
       "pending": [
         "Linux dual boot"
       ]

@@ -6,8 +6,9 @@ defects found while deploying the first rooms.
 ## Status
 
 The Linux provider and the Windows network share both work. Rooms can be applied
-from a second PC. The RAPTOR and Dev-C++ catalog defects are fixed; the Arduino
-detect path remains an open item.
+from a second PC. The RAPTOR, Dev-C++, Arduino IDE, Temurin, and TypeScript
+defects found during the first Windows deployment are fixed in the catalog and
+client.
 
 | Component | State | Evidence |
 | --- | --- | --- |
@@ -208,31 +209,36 @@ The catalog previously omitted the `Embarcadero\` directory. Its detection
 path now matches the installer, and the client repairs that all-users shortcut
 if Windows Search does not pick up the publisher-created one.
 
-### 3. `arduino-ide` detect path names the wrong folder
+### 3. `arduino-ide` installs per-user and names the wrong folder — fixed
 
 ```
-ALLUSERS          = 2                                      (per-machine when elevated - fine)
+ALLUSERS          = 2
+MSIINSTALLPERUSER = 1
 APPLICATIONFOLDER = ProgramFiles64Folder\arduino-ide  ->  C:\Program Files\arduino-ide
 ```
 
-The catalog says `C:\Program Files\Arduino IDE\Arduino IDE.exe`. The application
-is installed machine-wide and visible, but `detect` never matches, so it is
-reinstalled on every run. The correct folder is `arduino-ide`; **the executable
-filename inside has not been confirmed.**
+That property combination defaults to a per-user install. Windows confirmed the
+existing copy at `%LOCALAPPDATA%\Programs\arduino-ide\Arduino IDE.exe`, while the
+MSI Directory table defines its machine target as
+`C:\Program Files\arduino-ide\Arduino IDE.exe`. The catalog now passes
+`ALLUSERS=1 MSIINSTALLPERUSER=`, checks the machine target, and repairs an
+all-users shortcut. Windows Installer returned success without changing the
+context of an already-installed per-user copy, so that old copy must be removed
+once before rerunning SETUP.
 
-### 4. `detect` paths for non-MSI packages are unverified
+### 4. Remaining `detect` paths need wider Windows coverage
 
-`detect.path` was only checkable for MSI packages, by reading their Directory
-tables. The `exe`, `zip`, and `npm` packages cannot be verified from Linux. The
-same wrong-path defect may exist in any of them. A wrong `detect` path does not
-break installation, but it causes silent reinstallation on every run.
+The Room 208 file paths were checked on Windows. Other rooms still contain EXE
+and ZIP packages that have not been installed on this client, so their paths
+need confirmation during the first room deployment.
 
-### 5. "Completed successfully" does not mean the software is usable
+### 5. "Completed successfully" did not mean the software was usable — fixed
 
-`install.ps1` prints success when every installer exits `0`, `1641`, or `3010`.
-That confirms the installer ran, not that the application is registered
-machine-wide, visible in the Start menu, or on `PATH`. The `raptor` case is
-exactly this: the run was successful and the application was still not findable.
+The client now fails the deployment when post-install detection fails. Command
+detection also checks an executable's exit code. This caught TypeScript 7's
+broken launcher: the main npm tarball requires a separate Windows x64 compiler
+package that the old offline install did not provide. That platform package is
+now part of every TypeScript room plan, and `tsc.cmd --version` verifies it.
 
 ### 6. Rooms are incomplete
 
@@ -264,15 +270,14 @@ separate decision.
 
 ## Not verified
 
-- **No Windows machine was available.** The `net use` and `-File` invocation,
-  and every installer's behaviour under `msiexec /qn` and NSIS `/S`, are
-  unverified end to end. The Linux side of the download path is verified
-  (checksums match); installation behaviour is not.
+- Room 208's installed paths and TypeScript compiler were checked on Windows.
+  A clean-machine installation of the complete merged plan has not been run.
 - Rooms were not re-applied after the `map to guest = never` change.
 
 ## Suggested next steps
 
-1. Restart the provider so the corrected RAPTOR and Dev-C++ catalog paths load.
+1. Fetch the new TypeScript Windows package, then restart the provider so the
+   merged catalog and room plans load.
 2. Run the affected rooms once with `-Force`; collect the automatic client log
    if a package still does not appear in Start search.
 3. Rotate the share password (open item 9).
