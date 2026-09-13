@@ -395,9 +395,9 @@ The provider does not receive logs automatically; copy or send the resulting
 file to the operator when a Windows installation needs investigation.
 
 Detection checks whether a file exists; it does not compare installed versions.
-After an installer exits successfully, SETUP checks that same file and fails if
-it is missing. To update or reinstall software that is already detected, add
-`-Force`:
+After an installer exits successfully, SETUP retries its verification briefly
+and fails if the expected file or command is still unavailable. To update or
+reinstall software that is already detected, add `-Force`:
 
 ```cmd
 \\mtes-pkg\software\scripts\setup.cmd room-302 -Force

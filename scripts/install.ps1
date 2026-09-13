@@ -118,10 +118,19 @@ function Assert-PackageInstalled {
         throw "Package '$($Package.id)' has no detection rule; installation cannot be verified."
     }
 
-    if (-not (Test-PackageInstalled -Package $Package)) {
-        $detectPath = [Environment]::ExpandEnvironmentVariables($Package.detect.path)
-        throw "Installer for '$($Package.id)' exited successfully, but its '$($Package.detect.type)' verification failed: $detectPath"
+    $attempts = 5
+    for ($attempt = 1; $attempt -le $attempts; $attempt++) {
+        if (Test-PackageInstalled -Package $Package) {
+            return
+        }
+        if ($attempt -lt $attempts) {
+            Write-Host "Verification for '$($Package.id)' is not ready; retrying ($attempt/$attempts)..."
+            Start-Sleep -Seconds 1
+        }
     }
+
+    $detectPath = [Environment]::ExpandEnvironmentVariables($Package.detect.path)
+    throw "Installer for '$($Package.id)' exited successfully, but its '$($Package.detect.type)' verification failed after $attempts attempts: $detectPath"
 }
 
 function Get-PackageFile {
