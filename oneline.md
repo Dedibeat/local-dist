@@ -7,7 +7,7 @@ command line.
 ## Recommended: map the script share
 
 ```cmd
-net use Z: /delete /y >nul 2>&1 & net use Z: \\10.3.122.102\software-scripts /user:dedibeat RoomDeploy-2026 && Z:\setup.cmd room-302 -ServerUrl http://10.3.122.102:8080
+net use Z: /delete /y >nul 2>&1 & net use Z: \\10.3.122.102\software-scripts /user:dedibeat RoomDeploy-2026 && Z:\setup.cmd room-208 -ServerUrl http://10.3.122.102:8080
 ```
 
 Change `room-302` for a different room. Change `10.3.122.102` if the server's
