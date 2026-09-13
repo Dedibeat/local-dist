@@ -18,7 +18,8 @@ func TestRoomPlanAndDownload(t *testing.T) {
     "id": "demo", "name": "Demo", "version": "1.0", "type": "exe",
     "source": "packages/demo/setup.exe",
     "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    "install": {"args": ["/S"]}
+    "install": {"args": ["/S"], "startMenu": {"folder": "Demo Tools", "name": "Demo.lnk"}},
+    "detect": {"type": "file", "path": "C:\\Program Files\\Demo\\demo.exe"}
   }]
 }`)
 	mustWrite(t, filepath.Join(dataDir, "rooms.json"), `{
@@ -48,6 +49,9 @@ func TestRoomPlanAndDownload(t *testing.T) {
 	}
 	if len(plan.Packages) != 1 || !plan.Packages[0].Available {
 		t.Fatalf("unexpected plan: %#v", plan)
+	}
+	if plan.Packages[0].Install.StartMenu == nil || plan.Packages[0].Install.StartMenu.Name != "Demo.lnk" {
+		t.Fatalf("start menu metadata was not returned: %#v", plan.Packages[0].Install)
 	}
 	if plan.Complete || len(plan.Pending) != 1 {
 		t.Fatalf("unexpected completion state: %#v", plan)

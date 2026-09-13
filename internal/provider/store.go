@@ -36,9 +36,15 @@ type Package struct {
 }
 
 type Install struct {
-	Args        []string `json:"args,omitempty"`
-	Destination string   `json:"destination,omitempty"`
-	AddToPath   []string `json:"addToPath,omitempty"`
+	Args        []string        `json:"args,omitempty"`
+	Destination string          `json:"destination,omitempty"`
+	AddToPath   []string        `json:"addToPath,omitempty"`
+	StartMenu   *StartMenuEntry `json:"startMenu,omitempty"`
+}
+
+type StartMenuEntry struct {
+	Folder string `json:"folder"`
+	Name   string `json:"name"`
 }
 
 type Detection struct {
@@ -187,6 +193,29 @@ func validatePackage(pkg Package) error {
 	}
 	if pkg.Detect != nil && (pkg.Detect.Type != "file" || pkg.Detect.Path == "") {
 		return fmt.Errorf("detect supports only a non-empty file path")
+	}
+	if pkg.Install.StartMenu != nil {
+		if pkg.Detect == nil || pkg.Detect.Type != "file" {
+			return fmt.Errorf("install.startMenu requires a file detect rule")
+		}
+		if err := validateStartMenuPart("folder", pkg.Install.StartMenu.Folder); err != nil {
+			return err
+		}
+		if err := validateStartMenuPart("name", pkg.Install.StartMenu.Name); err != nil {
+			return err
+		}
+		if !strings.HasSuffix(strings.ToLower(pkg.Install.StartMenu.Name), ".lnk") {
+			return fmt.Errorf("install.startMenu.name must end in .lnk")
+		}
+	}
+	return nil
+}
+
+func validateStartMenuPart(field, value string) error {
+	if strings.TrimSpace(value) == "" || value == "." || value == ".." ||
+		strings.ContainsAny(value, `/\\:*?"<>|`) ||
+		strings.IndexFunc(value, func(r rune) bool { return r < 32 }) >= 0 {
+		return fmt.Errorf("install.startMenu.%s must be a single safe filename part", field)
 	}
 	return nil
 }

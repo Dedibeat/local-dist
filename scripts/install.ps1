@@ -6,7 +6,9 @@ param(
 
     [string]$ServerUrl = 'http://mtes-pkg:8080',
 
-    [switch]$Force
+    [switch]$Force,
+
+    [string]$LogPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -14,6 +16,17 @@ $ProgressPreference = 'SilentlyContinue'
 $ServerUrl = $ServerUrl.TrimEnd('/')
 $CacheRoot = Join-Path $env:ProgramData 'MTES\LocalDist\cache'
 $script:RebootRequired = $false
+$script:TranscriptStarted = $false
+$script:LogAvailable = $false
+$exitCode = 1
+
+if ([string]::IsNullOrWhiteSpace($LogPath)) {
+    $computerName = $env:COMPUTERNAME
+    if ([string]::IsNullOrWhiteSpace($computerName)) {
+        $computerName = 'computer'
+    }
+    $LogPath = Join-Path $env:ProgramData ('MTES\LocalDist\logs\setup-{0}-{1}.log' -f $computerName, (Get-Date -Format 'yyyyMMdd-HHmmss'))
+}
 
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $principal = [Security.Principal.WindowsPrincipal]::new($identity)
@@ -22,15 +35,53 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
     exit 1
 }
 
+function Start-DeploymentLog {
+    param([string]$Path)
+
+    try {
+        $directory = Split-Path -Parent -Path $Path
+        if (-not [string]::IsNullOrWhiteSpace($directory)) {
+            New-Item -ItemType Directory -Force -Path $directory | Out-Null
+        }
+        Start-Transcript -Path $Path -Append -ErrorAction Stop | Out-Null
+        $script:TranscriptStarted = $true
+        $script:LogAvailable = $true
+        Write-Host "Deployment log: $Path"
+    }
+    catch {
+        Write-Warning "Could not start deployment log at '$Path': $($_.Exception.Message)"
+    }
+}
+
+function Stop-DeploymentLog {
+    if (-not $script:TranscriptStarted) {
+        return
+    }
+    try {
+        Stop-Transcript | Out-Null
+    }
+    catch {
+        Write-Warning "Could not finish deployment log at '$LogPath': $($_.Exception.Message)"
+    }
+    $script:TranscriptStarted = $false
+}
+
+Start-DeploymentLog -Path $LogPath
+
 function Test-PackageInstalled {
     param([object]$Package)
 
     if ($null -eq $Package.detect) {
+        Write-Host "Detection for $($Package.id): no file rule"
         return $false
     }
     if ($Package.detect.type -eq 'file') {
-        return Test-Path -LiteralPath ([Environment]::ExpandEnvironmentVariables($Package.detect.path)) -PathType Leaf
+        $path = [Environment]::ExpandEnvironmentVariables($Package.detect.path)
+        $installed = Test-Path -LiteralPath $path -PathType Leaf
+        Write-Host "Detection for $($Package.id): $installed ($path)"
+        return $installed
     }
+    Write-Host "Detection for $($Package.id): unsupported rule type '$($Package.detect.type)'"
     return $false
 }
 
@@ -117,9 +168,57 @@ function Install-Package {
     if ($null -ne $process -and $process.ExitCode -notin @(0, 1641, 3010)) {
         throw "Installer for '$($Package.id)' exited with code $($process.ExitCode)."
     }
+    if ($null -ne $process) {
+        Write-Host "Installer exit code for $($Package.id): $($process.ExitCode)"
+    }
     if ($null -ne $process -and $process.ExitCode -in @(1641, 3010)) {
         $script:RebootRequired = $true
         Write-Warning "Installer for '$($Package.id)' requires a restart."
+    }
+}
+
+function Ensure-StartMenuShortcut {
+    param([object]$Package)
+
+    if ($null -eq $Package.install.startMenu) {
+        return
+    }
+    if ($null -eq $Package.detect -or $Package.detect.type -ne 'file') {
+        Write-Warning "Cannot create a Start-menu shortcut for '$($Package.id)' without a file detection rule."
+        return
+    }
+
+    $target = [Environment]::ExpandEnvironmentVariables($Package.detect.path)
+    if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
+        Write-Warning "Cannot create a Start-menu shortcut for '$($Package.id)': target is missing ($target)."
+        return
+    }
+
+    $programs = Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs'
+    $folder = Join-Path $programs $Package.install.startMenu.folder
+    $shortcutPath = Join-Path $folder $Package.install.startMenu.name
+    $shell = $null
+    $shortcut = $null
+    try {
+        New-Item -ItemType Directory -Force -Path $folder | Out-Null
+        $shell = New-Object -ComObject WScript.Shell
+        $shortcut = $shell.CreateShortcut($shortcutPath)
+        $shortcut.TargetPath = $target
+        $shortcut.WorkingDirectory = Split-Path -Parent -Path $target
+        $shortcut.Description = $Package.name
+        $shortcut.Save()
+        Write-Host "Start-menu shortcut ready: $shortcutPath -> $target"
+    }
+    catch {
+        Write-Warning "Could not create Start-menu shortcut for '$($Package.id)': $($_.Exception.Message)"
+    }
+    finally {
+        if ($null -ne $shortcut) {
+            [void][Runtime.InteropServices.Marshal]::ReleaseComObject($shortcut)
+        }
+        if ($null -ne $shell) {
+            [void][Runtime.InteropServices.Marshal]::ReleaseComObject($shell)
+        }
     }
 }
 
@@ -158,18 +257,35 @@ try {
         else {
             $installer = Get-PackageFile -Package $package
             Install-Package -Package $package -Installer $installer
+            if ($null -ne $package.detect -and -not (Test-PackageInstalled -Package $package)) {
+                Write-Warning "Installer completed for '$($package.id)', but its detection path is not present."
+            }
         }
         Update-PackagePath -Package $package
+        Ensure-StartMenuShortcut -Package $package
     }
 
     Write-Host 'Available deployment batch completed successfully.'
     if ($script:RebootRequired) {
         Write-Warning 'Restart Windows to finish installation.'
-        exit 3010
+        $exitCode = 3010
     }
-    exit 0
+    else {
+        $exitCode = 0
+    }
 }
 catch {
     Write-Error $_ -ErrorAction Continue
-    exit 1
+    $exitCode = 1
 }
+finally {
+    Stop-DeploymentLog
+}
+
+if ($script:LogAvailable) {
+    Write-Host "Deployment log saved to: $LogPath"
+}
+else {
+    Write-Warning "Deployment log was not saved. Requested path: $LogPath"
+}
+exit $exitCode

@@ -6,8 +6,8 @@ defects found while deploying the first rooms.
 ## Status
 
 The Linux provider and the Windows network share both work. Rooms can be applied
-from a second PC. Two catalog defects were found and are **not yet fixed** — see
-[Open items](#open-items).
+from a second PC. The RAPTOR and Dev-C++ catalog defects are fixed; the Arduino
+detect path remains an open item.
 
 | Component | State | Evidence |
 | --- | --- | --- |
@@ -152,7 +152,7 @@ and revert with `sudo smbcontrol smbd debug 0`.
 
 ## Open items
 
-### 1. `raptor` installs per-user and is invisible to other users
+### 1. `raptor` installs per-user and is invisible to other users — fixed
 
 Read from the MSI's own tables (`msiinfo export wixedit_raptor.msi`):
 
@@ -180,7 +180,7 @@ The catalog also names the wrong folder:
 Since the 32-bit template resolves `ProgramFilesFolder` to
 `C:\Program Files (x86)` on 64-bit Windows.
 
-Proposed change to `data/catalog.json`:
+The catalog now uses:
 
 ```json
 "install": { "args": ["ALLUSERS=1"] },
@@ -190,9 +190,25 @@ Proposed change to `data/catalog.json`:
 `ALLUSERS=1` makes the install machine-wide so every user sees it. Note the
 existing per-user copy shares the same ProductCode
 (`{62E8746B-9FBB-4E5A-AA2C-0A6B787C7338}`), so installing with `ALLUSERS=1` may
-return error 1638 until the per-user copy is removed.
+return error 1638 until the per-user copy is removed. The Windows client also
+repairs the all-users `RAPTOR Avalonia\RAPTOR.lnk` shortcut. A one-time `-Force`
+run may be needed to migrate an existing per-user copy.
 
-### 2. `arduino-ide` detect path names the wrong folder
+### 2. Dev-C++ detect path names the wrong folder — fixed
+
+The official NSIS script uses `InstallDir $PROGRAMFILES\Embarcadero\Dev-Cpp`
+and creates `Embarcadero Dev-C++\Dev-C++.lnk` in the all-users Start menu. This
+32-bit installer therefore resolves to:
+
+```
+C:\Program Files (x86)\Embarcadero\Dev-Cpp\devcpp.exe
+```
+
+The catalog previously omitted the `Embarcadero\` directory. Its detection
+path now matches the installer, and the client repairs that all-users shortcut
+if Windows Search does not pick up the publisher-created one.
+
+### 3. `arduino-ide` detect path names the wrong folder
 
 ```
 ALLUSERS          = 2                                      (per-machine when elevated - fine)
@@ -204,41 +220,41 @@ is installed machine-wide and visible, but `detect` never matches, so it is
 reinstalled on every run. The correct folder is `arduino-ide`; **the executable
 filename inside has not been confirmed.**
 
-### 3. `detect` paths for non-MSI packages are unverified
+### 4. `detect` paths for non-MSI packages are unverified
 
 `detect.path` was only checkable for MSI packages, by reading their Directory
 tables. The `exe`, `zip`, and `npm` packages cannot be verified from Linux. The
 same wrong-path defect may exist in any of them. A wrong `detect` path does not
 break installation, but it causes silent reinstallation on every run.
 
-### 4. "Completed successfully" does not mean the software is usable
+### 5. "Completed successfully" does not mean the software is usable
 
 `install.ps1` prints success when every installer exits `0`, `1641`, or `3010`.
 That confirms the installer ran, not that the application is registered
 machine-wide, visible in the Start menu, or on `PATH`. The `raptor` case is
 exactly this: the run was successful and the application was still not findable.
 
-### 5. Rooms are incomplete
+### 6. Rooms are incomplete
 
 `room-208` and `room-302` both report `complete: false` with **4 pending
 requirement groups**. Applying a room installs only its listed packages and does
 not finish the room. This is correct behaviour and must not be papered over by
 marking rooms complete.
 
-### 6. The server address is DHCP-assigned
+### 7. The server address is DHCP-assigned
 
 `10.3.122.102` is dynamic. The share path and `-ServerUrl` both hard-code it, so
 a lease change breaks every client until the commands are updated. Either set a
 static lease or create the planned `mtes-pkg` DNS name.
 
-### 7. The host is a laptop that suspends when the lid closes
+### 8. The host is a laptop that suspends when the lid closes
 
 `systemd-logind` uses the default `HandleLidSwitch=suspend`, which applies on AC
 power too. Closing the lid stops the share and the HTTP API mid-deployment.
 Keep the lid open, or set `HandleLidSwitch=ignore` in
 `/etc/systemd/logind.conf`.
 
-### 8. A share credential is committed in git history
+### 9. A share credential is committed in git history
 
 `oneline.md` contained the plaintext Samba password and was committed. The
 working copy has been redacted to a placeholder, **but the value remains in the
@@ -256,10 +272,11 @@ separate decision.
 
 ## Suggested next steps
 
-1. Decide on the `raptor` and `arduino-ide` catalog corrections (open items 1
-   and 2), then restart the provider so the catalog reloads.
-2. Rotate the share password (open item 8).
-3. Confirm the remaining `detect` paths on a real PC (open item 3).
-4. Consider serving the client script over HTTP so the share credential is not
+1. Restart the provider so the corrected RAPTOR and Dev-C++ catalog paths load.
+2. Run the affected rooms once with `-Force`; collect the automatic client log
+   if a package still does not appear in Start search.
+3. Rotate the share password (open item 9).
+4. Confirm the remaining `detect` paths on a real PC (open item 4).
+5. Consider serving the client script over HTTP so the share credential is not
    needed at all; this requires a new route in `internal/provider/http.go`,
    because `/files/` serves only files named in the catalog.

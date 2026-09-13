@@ -58,6 +58,31 @@ func TestValidatePackageAcceptsNPM(t *testing.T) {
 	}
 }
 
+func TestValidatePackageStartMenu(t *testing.T) {
+	base := Package{
+		ID: "demo", Name: "Demo", Version: "1.0", Type: "exe",
+		Source: "packages/demo/setup.exe", SHA256: strings.Repeat("0", 64),
+		Detect: &Detection{Type: "file", Path: `C:\Program Files\Demo\demo.exe`},
+	}
+	base.Install.StartMenu = &StartMenuEntry{Folder: "Demo Tools", Name: "Demo.lnk"}
+	if err := validatePackage(base); err != nil {
+		t.Fatalf("validate start menu entry: %v", err)
+	}
+
+	for _, entry := range []*StartMenuEntry{
+		{Folder: "", Name: "Demo.lnk"},
+		{Folder: "..", Name: "Demo.lnk"},
+		{Folder: "Demo\\Tools", Name: "Demo.lnk"},
+		{Folder: "Demo Tools", Name: "Demo.exe"},
+	} {
+		pkg := base
+		pkg.Install.StartMenu = entry
+		if err := validatePackage(pkg); err == nil {
+			t.Fatalf("accepted unsafe start menu entry %#v", entry)
+		}
+	}
+}
+
 func TestReadJSONRejectsTrailingContent(t *testing.T) {
 	for _, suffix := range []string{` {"schemaVersion":2}`, " garbage"} {
 		filename := filepath.Join(t.TempDir(), "catalog.json")
